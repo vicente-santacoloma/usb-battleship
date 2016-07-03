@@ -1,0 +1,17 @@
+Estrategia para resolver BattleShip
+
+La maquina va a tratar de resolver el tablero realizando ataques aleatorios al tablero.
+A medida que va realizando los disparos almacena los que acierten en un barco, y los que fallen.
+
+Si logra encontrar la solucion con los disparos disponibles finaliza y muestra dicha solucion.
+
+Si no lo logra regresa en el backtracking e intenta resolver nuevamente el tablero desde cero, pero
+ahora empleando la informacion almacenada de la ubicacion de los fallos y de los golpes a los barcos.
+Ahora atacara donde ya exploro que habia un barco porque lo impacto y no atacara donde ya sabe que producira
+un fallo. Esto lo hara hasta que consiga la solucion del tablero.
+
+Es posible que una solucion no muestre fallos puesto que pude haber fallado mas que dar al golpes al tratar de
+conseguir la solucion, y en la proxima recursion tendra mas probabilidades de acertar en los barcos restantes.
+
+En caso de no disponer de los disparos necesarios para acertar a todos los barcos, terminara la ejecucion del programa
+en false.

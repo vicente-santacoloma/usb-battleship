@@ -1,0 +1,97 @@
+% Tablero Inicial
+% Prolog proyecto 2
+% Andreth Salazar, Vicente Santacoloma
+
+% Dentro de nuestra implementacion es conveniente acotar
+% que existiran desde el inicio del juego una serie de tuplas
+% en la base de conocimiento. Por ejemplo la forma de saber 
+% cuantos barcos faltan por eliminar se hara preguntandole
+% al predicado barcosRestantes(+X,Y) donde X son los barcos totales
+% del inicio por hundir y Y los que hasta algun punto se han hundido.
+
+% TableroInicial(+F,+C,+T) :- se cumple cuando 
+% teniendo F filas y C columnas, T es una lista con 
+% F listas. Cada lista F tiene C elementos 'a'
+% que representan  solo agua en la posicion del
+% tablero. De esta manera podremos pensar en acceder
+% a la fila i (primer nivel de listas) y la columna j 
+% ya a nivel de elementos. En todo momento F, C y T deben 
+% tener valor.
+% Tomaremos como caso base el tablero de tamaño  1 * C
+% debido a que el tablero con 0 elementos no tiene sentido.
+% recorremos las columnas con un predicado auxiliar
+% que decide si una fila es tablero inicial
+% Esto funciona perfecto!
+tableroInicial(1,C,[T]) :- tableroIniFila(C,T).
+
+tableroInicial(F,C,[T|T2]) :- %recorrido por filas
+  F0 is F-1,
+  tableroIniFila(C,T), 
+  tableroInicial(F0,C,T2).
+
+tableroIniFila(1,['a']). %caso base por fila
+
+tableroIniFila(C,['a'|Row]) :- %recorrido por columnas
+  Tam is C-1,
+  tableroIniFila(Tam,Row).
+
+
+% EstadoFinal verifica que todos los lugares donde inicialmente
+% habia barcos estan ahora llenos de valores 'h' lo que representa
+% barcos hundidos. Dada la informacion de los barcos podemos
+% acceder a los index de las listas para comprobar lo que deberia
+% tener   el tablero 
+% Funciona perfecto!
+estadoFinal(T) :- estadoFinalIndex(T,0,0).
+
+estadoFinalIndex([T|T2],F,C) :- %recorrido por filas
+  F0 is F+1, 
+  estadoFinalFila(T,F,C),
+  estadoFinalIndex(T2,F0,C).
+
+estadoFinalIndex([],_,_). % cola vacia
+
+estadoFinalFila([T|T2],F,C):-
+  C0 is C+1,
+  estadoFinalCelda(T,F,C),
+  estadoFinalFila(T2,F,C0).
+
+estadoFinalFila([],_,_). % cuando la fila esta vacia estas en estado final
+
+% Estado final celda regresa true si una celda esta en estado final
+% es decir si no hay barcos en ella o si hay algun barco esta hundido
+% Funciona perfecto!
+
+estadoFinalCelda(_,F,C) :- %Cuando no hay barco ya estas en estado final
+  not(hayBarco(F,C)).
+
+estadoFinalCelda(E,F,C) :- % Si hay un barco debe tener una h de hundido
+  hayBarco(F,C),
+  E = 'h'.
+
+
+% hayBarco(F,C) regresa true si hay un barco en la lista i columna j
+% F representa la fila y C la columna
+% Caso base el barco empieza por la misma fila columna 
+% Esto funciona perfecto!
+hayBarco(F,C) :-
+  barco(F,C,_,_). %Hay un barco en la misma fila columna
+
+hayBarco(F,C) :-
+  barco(F,C1, 'H', K), %C es menor que el ultimo indice de columna del barco
+  C =< (C1+K-1),
+  C > C1.
+
+hayBarco(F,C) :-
+  barco(F1,C, 'V', K), %F es menor que el ultimo indice de fila del barco
+  F =< (F1+K-1),
+  F > F1.
+
+% mostrarTablero(T) imprime por salida estandar el tablero de juego.
+% realiza un recorrido con recursion por todo el tablero
+% Funciona perfecto y tab es para hacer espacios nl es new line
+mostrarTablero([]).
+mostrarTablero([T|T2]):- mostrarTableroFila(T) , nl , mostrarTablero(T2).
+
+mostrarTableroFila([]).
+mostrarTableroFila([E|Resto]):- write(E),tab(1), mostrarTableroFila(Resto).
